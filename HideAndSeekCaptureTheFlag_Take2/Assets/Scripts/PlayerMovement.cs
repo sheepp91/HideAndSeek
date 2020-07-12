@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Transform light;
+    public new Transform light;
     public GameObject playerGraphics;
 
     public float speed = 5f;
