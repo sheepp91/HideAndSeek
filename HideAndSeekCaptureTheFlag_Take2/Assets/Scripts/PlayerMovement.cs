@@ -4,57 +4,45 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public new Transform light;
-    public GameObject playerGraphics;
+    public Transform player;
+    public Transform playerBase;
+    public LayerMask Ignore;
 
-    public float speed = 5f;
-
-    //private Rigidbody rb;
-    private MeshRenderer playerMesh;
     private MeshRenderer[] playerChildMeshes;
 
     void Start()
     {
-        //rb = GetComponent<Rigidbody>();
-        playerMesh = playerGraphics.GetComponent<MeshRenderer>();
-        playerChildMeshes = playerGraphics.GetComponentsInChildren<MeshRenderer>();
+        playerChildMeshes = GetComponentsInChildren<MeshRenderer>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        //float moveHorizontal = Input.GetAxis("Horizontal");
-        //float moveVertical = Input.GetAxis("Vertical");
-        //
-        //Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        //
-        //rb.AddForce(movement * speed);
-
-        CheckInvisible();
+        GameObject[] lightSources = GameObject.FindGameObjectsWithTag("MainLightSource");
+        CheckInvisible(lightSources);
+        lightSources = GameObject.FindGameObjectsWithTag("LightSource");
+        CheckInvisible(lightSources);
     }
 
-    private void CheckInvisible()
+    private void CheckInvisible(GameObject[] lightSources)
     {
-
-        Vector3 lightRot = light.forward;
-        Vector3 directionToLight = light.forward * -1;
-
         RaycastHit hit;
-
-        Debug.DrawRay(transform.position, directionToLight, Color.red);
-
-        if (Physics.Raycast(transform.position, directionToLight, out hit, Mathf.Infinity))
+        
+        foreach (GameObject light in lightSources)
         {
-            MakeVisible(false);
-        }
-        else
-        {
-            MakeVisible(true);
+            Vector3 directionToLight = light.transform.forward * -1;
+            if (Physics.Raycast(playerBase.position, directionToLight, out hit, Mathf.Infinity, ~Ignore))//, 9))
+            {
+                MakeVisible(false);
+            }
+            else
+            {
+                MakeVisible(true);
+            }
         }
     }
 
     private void MakeVisible(bool shouldBeVisble)
     {
-        playerGraphics.GetComponent<MeshRenderer>().enabled = shouldBeVisble;
         foreach (MeshRenderer mr in playerChildMeshes)
         {
             mr.enabled = shouldBeVisble;
